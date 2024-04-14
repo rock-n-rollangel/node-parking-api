@@ -1,21 +1,31 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min } from "class-validator";
-import { TimeHelper } from "src/helpers/time.helper";
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Matches,
+  Max,
+} from 'class-validator';
+import { TimeHelper } from 'src/helpers/time.helper';
 
 export class CreateTariffDto {
-    @IsNotEmpty()
-    @IsNumber()
-    startAt: number;
+  @IsNotEmpty()
+  @IsString()
+  @Matches(TimeHelper.regex)
+  startAt: string;
 
-    @IsNotEmpty()
-    @IsNumber()
-    endAt: number;
+  @IsNotEmpty()
+  @IsString()
+  @Matches(TimeHelper.regex)
+  endAt: string;
 
-    @IsNotEmpty()
-    @IsNumber()
-    @Max(Number.MAX_SAFE_INTEGER)
-    price: number;
+  @IsNotEmpty()
+  @IsNumber()
+  @Max(Number.MAX_SAFE_INTEGER)
+  price: number;
 
-    @IsOptional()
-    @IsBoolean()
-    default: boolean;
+  @IsOptional()
+  @IsBoolean()
+  default: boolean;
 }

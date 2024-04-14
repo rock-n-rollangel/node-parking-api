@@ -4,8 +4,8 @@ import { UpdateTariffDto } from './dto/update-tariff.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Tariff } from './entities/tariff.entity';
+import { TimeReservedException } from './exceptions/tariffs.exceptions.time-reserved';
 import { TimeHelper } from 'src/helpers/time.helper';
-import { PartialType } from '@nestjs/mapped-types';
 
 @Injectable()
 export class TariffsService {
@@ -14,10 +14,19 @@ export class TariffsService {
     private tariffsRepository: Repository<Tariff>,
   ) {}
 
-  create(createTariffDto: CreateTariffDto) {
+  async create(createTariffDto: CreateTariffDto) {
+    const timeSlice = {
+      startAt: TimeHelper.getSecondsFromTime(createTariffDto.startAt),
+      endAt: TimeHelper.getSecondsFromTime(createTariffDto.endAt),
+    };
+
+    if (await this.hasWithTimeSlice(timeSlice.startAt, timeSlice.endAt)) {
+      throw new TimeReservedException();
+    }
+
     const tariff = new Tariff();
-    tariff.startAt = createTariffDto.startAt;
-    tariff.endAt = createTariffDto.endAt;
+    tariff.startAt = timeSlice.startAt;
+    tariff.endAt = timeSlice.endAt;
     tariff.price = createTariffDto.price;
     tariff.default = createTariffDto.default ? true : false;
 
@@ -32,18 +41,46 @@ export class TariffsService {
     return this.tariffsRepository.findOneBy({ id: id });
   }
 
-  update(id: number, updateTariffDto: UpdateTariffDto) {
-    return this.tariffsRepository.update({ id: id }, updateTariffDto);
+  async update(id: number, updateTariffDto: UpdateTariffDto) {
+    const tariff = await this.findOne(id);
+    const timeSlice = {
+      startAt: tariff.startAt,
+      endAt: tariff.endAt,
+    };
+
+    if (updateTariffDto.startAt) {
+      timeSlice.startAt = TimeHelper.getSecondsFromTime(
+        updateTariffDto.startAt,
+      );
+    }
+
+    if (updateTariffDto.endAt) {
+      timeSlice.endAt = TimeHelper.getSecondsFromTime(updateTariffDto.endAt);
+    }
+
+    if (
+      timeSlice.startAt !== tariff.startAt ||
+      timeSlice.endAt !== tariff.endAt
+    ) {
+      if (await this.hasWithTimeSlice(timeSlice.startAt, timeSlice.endAt)) {
+        throw new TimeReservedException();
+      }
+    }
+
+    return this.tariffsRepository.update(
+      { id: id },
+      {
+        ...updateTariffDto,
+        ...timeSlice,
+      },
+    );
   }
 
   remove(id: number) {
     return this.tariffsRepository.delete({ id: id });
   }
 
-  async hasWithTimeSlice(
-    startAt: number,
-    endAt: number,
-  ): Promise<boolean> {
+  async hasWithTimeSlice(startAt: number, endAt: number): Promise<boolean> {
     const tariffExists = await this.tariffsRepository
       .createQueryBuilder()
       .from(Tariff, 'tariffs')

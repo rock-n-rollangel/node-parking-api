@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { VisitorsService } from './visitors.service';
 import { CreateVisitorDto } from './dto/create-visitor.dto';
 import { UpdateVisitorDto } from './dto/update-visitor.dto';
@@ -14,7 +22,7 @@ export class VisitorsController {
 
   @Post(':id/leave')
   leave(@Param('id') id: string) {
-    return this.visitorsService.leave(+id)
+    return this.visitorsService.leave(+id);
   }
 
   @Get()

@@ -8,14 +8,17 @@ describe('VisitorsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [VisitorsService, {
-        provide: getRepositoryToken(Visitor),
-        useValue: {
-          create: jest.fn(),
-          update: jest.fn(),
-          findOne: jest.fn(),
-        }
-      }],
+      providers: [
+        VisitorsService,
+        {
+          provide: getRepositoryToken(Visitor),
+          useValue: {
+            create: jest.fn(),
+            update: jest.fn(),
+            findOne: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     service = module.get<VisitorsService>(VisitorsService);

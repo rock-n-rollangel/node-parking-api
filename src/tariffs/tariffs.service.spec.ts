@@ -19,14 +19,14 @@ describe('TariffsService', () => {
           provide: REPOSITORY_TOKEN,
           useValue: {
             create: jest.fn(),
-            save: jest.fn()
+            save: jest.fn(),
           },
         },
       ],
     }).compile();
 
     service = module.get<TariffsService>(TariffsService);
-    tariffsRepository = module.get<Repository<Tariff>>(REPOSITORY_TOKEN)
+    tariffsRepository = module.get<Repository<Tariff>>(REPOSITORY_TOKEN);
   });
 
   it('service should be defined', () => {
@@ -39,12 +39,12 @@ describe('TariffsService', () => {
 
   describe('Tariff create', () => {
     it('should create tariff', async () => {
-      const data: CreateTariffDto = new CreateTariffDto;
-      data.startAt = 0;
-      data.endAt = 3600;
+      const data: CreateTariffDto = new CreateTariffDto();
+      data.startAt = '00:00';
+      data.endAt = '01:00';
       data.price = 1000;
 
-      await service.create(data)
+      await service.create(data);
     });
   });
 });

@@ -1,16 +1,16 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Visitor {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    number: string;
+  @Column()
+  number: string;
 
-    @Column({ type: 'timestamp', nullable: true })
-    leftAt: string;
+  @Column({ type: 'timestamp', nullable: true })
+  leftAt: string;
 
-    @Column({ type: 'timestamp', nullable: true })
-    enteredAt: string;
+  @Column({ type: 'timestamp', nullable: true })
+  enteredAt: string;
 }
